@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 
-export const getAllContacts = async () => await Contact.find();
+export const getAllContacts = async () => await Contact.find().lean();
 export const getContactById = async (id) => {
   const contact = await Contact.findById(id);
 
@@ -30,5 +30,10 @@ export const upsertContact = async (id, payload, options = {}) => {
   };
 };
 
-export const deleteContactById = async (contactId) =>
-  await Contact.findByIdAndDelete(contactId);
+export const deleteContactById = async (contactId) => {
+  const result = await Contact.findByIdAndDelete(contactId);
+
+  if (!result) {
+    throw createHttpError(404, 'Contact you want to delete - not found');
+  }
+};
