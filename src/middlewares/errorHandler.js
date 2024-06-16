@@ -7,10 +7,8 @@ export const errorHandler = (err, req, res, next) => {
   if (isHttpError(err)) {
     return res.status(statusCode).json({
       status: statusCode,
-      message: 'Not Found :(',
-      data: {
-        message: err.message,
-      },
+      message: err.message,
+      error: err.errors || [],
     });
   }
 

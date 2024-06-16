@@ -5,10 +5,22 @@ import {
   getContactById,
   upsertContact,
 } from '../services/contacts.js';
+import { parseFilters } from '../utils/filter.js';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const getContactsController = async (req, res) => {
+  const { page, perPage } = parsePaginationParams(req.query);
+  const { sortBy, sortOrder } = req.query;
+  const filter = parseFilters(req.query);
+
   try {
-    const contacts = await getAllContacts();
+    const contacts = await getAllContacts({
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+      filter,
+    });
     if (!contacts) {
       return res.status(404).json({
         status: 404,

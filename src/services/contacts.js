@@ -1,7 +1,62 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 
-export const getAllContacts = async () => await Contact.find().lean();
+const createPaginationInformation = (page, perPage, count) => {
+  const totalPages = Math.ceil(count / perPage);
+  const hasPreviousPage = page > 1;
+  const hasNextPage = page < totalPages;
+  return {
+    page,
+    perPage,
+    totalItems: count,
+    totalPages,
+    hasPreviousPage,
+    hasNextPage,
+  };
+};
+
+export const getAllContacts = async ({
+  page = 1,
+  perPage = 10,
+  sortBy = '_id',
+  sortOrder = 'asc',
+  filter = {},
+}) => {
+  const skip = perPage * (page - 1);
+
+  const contactsFilter = Contact.find();
+
+  if (filter.type) {
+    contactsFilter.where('contactType').equals(filter.type);
+  }
+  if (filter.favourite) {
+    contactsFilter.where('isFavourite').equals(filter.favourite);
+  }
+
+  const [contactsCount, contacts] = await Promise.all([
+    Contact.find().merge(contactsFilter).lean().countDocuments(),
+    Contact.find()
+      .merge(contactsFilter)
+      .lean()
+      .skip(skip)
+      .limit(perPage)
+      .sort({
+        [sortBy]: sortOrder.toLowerCase(),
+      })
+      .exec(),
+  ]);
+
+  const paginationInformation = createPaginationInformation(
+    page,
+    perPage,
+    contactsCount,
+  );
+
+  return {
+    contacts,
+    ...paginationInformation,
+  };
+};
 export const getContactById = async (id) => {
   const contact = await Contact.findById(id);
 
