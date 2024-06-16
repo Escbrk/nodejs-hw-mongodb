@@ -11,6 +11,6 @@ const parseBoolenFilter = (unknown) => {
 export const parseFilters = (query) => {
   return {
     type: parseTypeFilter(query.type),
-    favourite: parseBoolenFilter(query.favourite),
+    isFavourite: parseBoolenFilter(query.isFavourite),
   };
 };
