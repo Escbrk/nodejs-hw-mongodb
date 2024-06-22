@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import pino from 'pino-http';
+// import pino from 'pino-http';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { env } from './utils/env.js';
 import { ENV_VARS } from './constants/constants.js';
 
-import { contactsRouter } from './routers/contacts.js';
+import rootRouter from './routers/index.js';
 
 export const setupServer = () => {
   const app = express();
@@ -21,7 +21,7 @@ export const setupServer = () => {
   //   }),
   // );
 
-  app.use(contactsRouter);
+  app.use(rootRouter);
 
   app.use('*', notFoundHandler);
   app.use(errorHandler);
