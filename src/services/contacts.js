@@ -21,6 +21,8 @@ export const getAllContacts = async ({
   sortBy = '_id',
   sortOrder = 'asc',
   filter = {},
+  userId,
+  role,
 }) => {
   const skip = perPage * (page - 1);
 
@@ -31,6 +33,10 @@ export const getAllContacts = async ({
   }
   if (filter.isFavourite) {
     contactsFilter.where('isFavourite').equals(filter.isFavourite);
+  }
+
+  if (role !== 'admin') {
+    contactsFilter.where('parentId').equals(userId);
   }
 
   const [contactsCount, contacts] = await Promise.all([
@@ -57,6 +63,7 @@ export const getAllContacts = async ({
     ...paginationInformation,
   };
 };
+
 export const getContactById = async (id) => {
   const contact = await Contact.findById(id);
 
@@ -66,7 +73,8 @@ export const getContactById = async (id) => {
 
   return contact;
 };
-export const createContact = async (payload) => await Contact.create(payload);
+export const createContact = async (payload, userId) =>
+  await Contact.create({ ...payload, parentId: userId });
 
 export const upsertContact = async (id, payload, options = {}) => {
   const rawResults = await Contact.findByIdAndUpdate(id, payload, {

@@ -12,10 +12,13 @@ import { updateContactsSchema } from '../validation/updateContactsSchema.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { createContactsSchema } from '../validation/createContactsSchema.js';
 import { valideteMongoId } from '../middlewares/validateMongoId.js';
+import { authenticate } from '../middlewares/authenticate.js';
+import { checkRoles } from '../middlewares/checkRoles.js';
 
 const contactsRouter = Router();
 
 contactsRouter.use('/:contactId', valideteMongoId('contactId'));
+contactsRouter.use('/', authenticate);
 
 contactsRouter.get('/', ctrlWrapper(getContactsController));
 
@@ -29,12 +32,14 @@ contactsRouter.post(
 
 contactsRouter.patch(
   '/:contactId',
+  checkRoles('admin', 'user'),
   validateBody(updateContactsSchema),
   ctrlWrapper(patchContactController),
 );
 
 contactsRouter.put(
   '/:contactId',
+  checkRoles('admin', 'user'),
   validateBody(createContactsSchema),
   ctrlWrapper(putContactController),
 );

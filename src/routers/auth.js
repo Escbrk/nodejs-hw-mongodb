@@ -4,6 +4,8 @@ import { ctrlWrapper } from '../middlewares/ctrlWrapper.js';
 import { registerUserSchema } from '../validation/registerUserSchema.js';
 import {
   loginUserController,
+  logoutController,
+  refreshTokenController,
   registerUserController,
 } from '../controllers/auth.js';
 import { loginUserSchema } from '../validation/loginUserSchema.js';
@@ -20,7 +22,7 @@ authRouter.post(
   validateBody(loginUserSchema),
   ctrlWrapper(loginUserController),
 );
-// authRouter.post('/refresh', ctrlWrapper());
-// authRouter.post('/logout', ctrlWrapper());
+authRouter.post('/refresh', ctrlWrapper(refreshTokenController));
+authRouter.post('/logout', ctrlWrapper(logoutController));
 
 export default authRouter;
