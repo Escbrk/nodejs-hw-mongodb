@@ -1,4 +1,4 @@
-import { createUser } from '../services/auth.js';
+import { createUser, loginUser } from '../services/auth.js';
 
 export const registerUserController = async (req, res) => {
   const user = await createUser(req.body);
@@ -8,4 +8,8 @@ export const registerUserController = async (req, res) => {
     message: 'Successfully registered a user!',
     data: { user },
   });
+};
+
+export const loginUserController = async (req, res) => {
+  const user = await loginUser(req.body);
 };

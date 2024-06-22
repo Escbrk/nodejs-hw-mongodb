@@ -13,3 +13,9 @@ export const createUser = async (payload) => {
 
   return await User.create({ ...payload, password: hashedPassword });
 };
+
+export const loginUser = async ({ email, password }) => {
+  const user = User.findOne({ email });
+
+  if (!user) throw createHttpError(404, 'User not found!');
+};
