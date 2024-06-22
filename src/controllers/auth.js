@@ -1,4 +1,3 @@
-import createHttpError from 'http-errors';
 import { createUser, loginUser } from '../services/auth.js';
 import { setupSessionCookies } from '../utils/setupSessionCookies.js';
 
@@ -15,11 +14,11 @@ export const registerUserController = async (req, res) => {
 export const loginUserController = async (req, res) => {
   const session = await loginUser(req.body);
 
-  setupSessionCookies
+  setupSessionCookies(res, session);
 
   res.json({
     status: 200,
     message: 'Successfully logged in an user!',
-    data: { accessToken },
+    data: { accessToken: session.accessToken },
   });
 };

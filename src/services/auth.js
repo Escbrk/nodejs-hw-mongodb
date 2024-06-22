@@ -1,13 +1,17 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import { User } from '../db/models/user.js';
 import createHttpError from 'http-errors';
 import { Session } from '../db/models/session.js';
 
 const createSession = () => {
   return {
-    
-  }
-}
+    accessToken: crypto.randomBytes(40).toString('base64'),
+    refreshToken: crypto.randomBytes(40).toString('base64'),
+    accessTokenValidUntil: Date.now() + 1000 * 60 * 15,
+    refreshTokenValidUntil: Date.now() + 1000 * 60 * 60 * 24 * 30,
+  };
+};
 
 export const createUser = async (payload) => {
   const hashedPassword = await bcrypt.hash(payload.password, 10);
@@ -22,9 +26,10 @@ export const createUser = async (payload) => {
 };
 
 export const loginUser = async ({ email, password }) => {
-  const user = User.findOne({ email });
-
+  const user =await User.findOne({ email });
   if (!user) throw createHttpError(404, 'User not found!');
+  console.log(user.password);
+  console.log(user.email);
 
   const areEqual = await bcrypt.compare(password, user.password);
   if (!areEqual) throw createHttpError(401, 'Unautorized');
@@ -33,5 +38,6 @@ export const loginUser = async ({ email, password }) => {
 
   return await Session.create({
     userId: user.id,
+    ...createSession(),
   });
 };
