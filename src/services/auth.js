@@ -3,7 +3,7 @@ import { User } from '../db/models/user.js';
 import createHttpError from 'http-errors';
 
 export const createUser = async (payload) => {
-  const hashedPassword = await bcrypt.hash(payload.password, 20);
+  const hashedPassword = await bcrypt.hash(payload.password, 10);
 
   const user = await User.findOne({ email: payload.email });
 
