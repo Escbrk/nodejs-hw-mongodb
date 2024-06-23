@@ -13,6 +13,7 @@ const contactSchema = new Schema(
       default: 'personal',
     },
     parentId: { type: Schema.ObjectId, required: true },
+    // userId: { type: Schema.ObjectId, required: true, unique: true },
   },
   { timestamps: true, versionKey: false },
 );
