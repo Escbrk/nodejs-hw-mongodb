@@ -35,7 +35,7 @@ export const refreshTokenController = async (req, res) => {
   setupSessionCookies(res, session);
 
   res.json({
-    starus: 200,
+    status: 200,
     message: 'Successfully refreshed a session!',
     data: { accessToken: session.refreshToken },
   });

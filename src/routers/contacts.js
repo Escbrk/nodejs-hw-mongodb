@@ -22,7 +22,11 @@ contactsRouter.use('/', authenticate);
 
 contactsRouter.get('/', ctrlWrapper(getContactsController));
 
-contactsRouter.get('/:contactId', ctrlWrapper(getContactByIdController));
+contactsRouter.get(
+  '/:contactId',
+  checkRoles('admin', 'user'),
+  ctrlWrapper(getContactByIdController),
+);
 
 contactsRouter.post(
   '/',

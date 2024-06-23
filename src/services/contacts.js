@@ -64,11 +64,20 @@ export const getAllContacts = async ({
   };
 };
 
-export const getContactById = async (id) => {
-  const contact = await Contact.findById(id);
+export const getContactById = async (id, userId, role) => {
+  let contact;
+
+  if (role !== 'admin') {
+    contact = await Contact.findById(id).where('parentId').equals(userId);
+  } else {
+    contact = await Contact.findById(id);
+  }
 
   if (!contact) {
-    throw createHttpError(404, 'Contact not found');
+    throw createHttpError(
+      404,
+      'You dont have access to this contact or it was not created',
+    );
   }
 
   return contact;
