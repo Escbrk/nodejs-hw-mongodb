@@ -10,7 +10,7 @@ export const checkRoles =
     if (roles.includes('admin') && user.role === 'admin') return next();
 
     if (roles.includes('user') && user.role === 'user') {
-      const contact = await Contact.findById({
+      const contact = await Contact.findOne({
         _id: contactId,
         parentId: user._id,
       });
