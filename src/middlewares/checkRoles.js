@@ -17,4 +17,6 @@ export const checkRoles =
 
       if (!contact) return next(createHttpError(403, 'Access error'));
     }
+
+    return next();
   };

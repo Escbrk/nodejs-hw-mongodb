@@ -68,7 +68,7 @@ export const getContactById = async (id, userId, role) => {
   let contact;
 
   if (role !== 'admin') {
-    contact = await Contact.findOne(id).where('parentId').equals(userId);
+    contact = await Contact.findById(id).where('parentId').equals(userId);
   } else {
     contact = await Contact.findById(id);
   }
