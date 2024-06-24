@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
+import { ROLES } from '../constants/constants.js';
 
 export const checkRoles =
   (...roles) =>
@@ -7,9 +8,9 @@ export const checkRoles =
     const user = req.user;
     const { contactId } = req.params;
 
-    if (roles.includes('admin') && user.role === 'admin') return next();
+    if (roles.includes(ROLES.ADMIN) && user.role === ROLES.ADMIN) return next();
 
-    if (roles.includes('user') && user.role === 'user') {
+    if (roles.includes(ROLES.USER) && user.role === ROLES.USER) {
       const contact = await Contact.findOne({
         _id: contactId,
         userId: user._id,

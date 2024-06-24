@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
+import { ROLES } from '../constants/constants.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -35,7 +36,7 @@ export const getAllContacts = async ({
     contactsFilter.where('isFavourite').equals(filter.isFavourite);
   }
 
-  if (role !== 'admin') {
+  if (role !== ROLES.ADMIN) {
     contactsFilter.where('userId').equals(userId);
   }
 
@@ -64,13 +65,13 @@ export const getAllContacts = async ({
   };
 };
 
-export const getContactById = async (id, userId, role) => {
+export const getContactById = async (contactId, userId, role) => {
   let contact;
 
-  if (role !== 'admin') {
-    contact = await Contact.findOne({ _id: id, userId });
+  if (role !== ROLES.ADMIN) {
+    contact = await Contact.findOne({ _id: contactId, userId });
   } else {
-    contact = await Contact.findById({ _id: id });
+    contact = await Contact.findById({ _id: contactId });
   }
 
   if (!contact) {
@@ -85,8 +86,8 @@ export const getContactById = async (id, userId, role) => {
 export const createContact = async (payload, userId) =>
   await Contact.create({ ...payload, userId });
 
-export const upsertContact = async (id, payload, options = {}) => {
-  const rawResults = await Contact.findByIdAndUpdate(id, payload, {
+export const upsertContact = async (contactId, payload, options = {}) => {
+  const rawResults = await Contact.findByIdAndUpdate(contactId, payload, {
     new: true,
     includeResultMetadata: true,
     ...options,
@@ -105,7 +106,7 @@ export const upsertContact = async (id, payload, options = {}) => {
 export const deleteContactById = async (contactId, userId, role) => {
   let contact;
 
-  if (role !== 'admin') {
+  if (role !== ROLES.ADMIN) {
     contact = await Contact.findOneAndDelete({ _id: contactId, userId });
   } else {
     contact = await Contact.findByIdAndDelete(contactId);

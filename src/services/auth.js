@@ -3,13 +3,14 @@ import crypto from 'crypto';
 import { User } from '../db/models/user.js';
 import createHttpError from 'http-errors';
 import { Session } from '../db/models/session.js';
+import { TOKEN_PERIOD } from '../constants/constants.js';
 
 const createSession = () => {
   return {
     accessToken: crypto.randomBytes(40).toString('base64'),
     refreshToken: crypto.randomBytes(40).toString('base64'),
-    accessTokenValidUntil: Date.now() + 1000 * 60 * 15,
-    refreshTokenValidUntil: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    accessTokenValidUntil: TOKEN_PERIOD.MINS_15,
+    refreshTokenValidUntil: TOKEN_PERIOD.DAYS_30,
   };
 };
 
@@ -29,8 +30,8 @@ export const loginUser = async ({ email, password }) => {
   const user = await User.findOne({ email });
   if (!user) throw createHttpError(404, 'User not found!');
 
-  const areEqual = await bcrypt.compare(password, user.password);
-  if (!areEqual) throw createHttpError(401, 'Unautorized');
+  const isEqual = await bcrypt.compare(password, user.password);
+  if (!isEqual) throw createHttpError(401, 'Unautorized');
 
   await Session.deleteOne({ userId: user.id });
 
