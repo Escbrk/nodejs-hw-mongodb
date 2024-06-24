@@ -12,7 +12,7 @@ export const checkRoles =
     if (roles.includes('user') && user.role === 'user') {
       const contact = await Contact.findOne({
         _id: contactId,
-        parentId: user._id,
+        userId: user._id,
       });
 
       if (!contact) return next(createHttpError(403, 'Access error'));

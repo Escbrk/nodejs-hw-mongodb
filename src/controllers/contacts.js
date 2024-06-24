@@ -53,7 +53,7 @@ export const getContactByIdController = async (req, res) => {
 
 export const createContactController = async (req, res) => {
   const { body } = req;
-  const contact = await createContact(body, req.user._id);
+  const contact = await createContact(body, req.user._id); //! why not req.user.id ?????
 
   res.status(201).json({
     status: 201,
@@ -92,7 +92,7 @@ export const putContactController = async (req, res) => {
 
 export const deleteContactByIdController = async (req, res) => {
   const { contactId } = req.params;
-  await deleteContactById(contactId);
+  await deleteContactById(contactId, req.user._id, req.user.role);
 
   res.status(204).send();
 };

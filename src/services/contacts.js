@@ -36,7 +36,7 @@ export const getAllContacts = async ({
   }
 
   if (role !== 'admin') {
-    contactsFilter.where('parentId').equals(userId);
+    contactsFilter.where('userId').equals(userId);
   }
 
   const [contactsCount, contacts] = await Promise.all([
@@ -68,9 +68,9 @@ export const getContactById = async (id, userId, role) => {
   let contact;
 
   if (role !== 'admin') {
-    contact = await Contact.findOne(id).where('parentId').equals(userId);
+    contact = await Contact.findOne({ _id: id, userId });
   } else {
-    contact = await Contact.findById(id);
+    contact = await Contact.findById({ _id: id });
   }
 
   if (!contact) {
@@ -83,7 +83,7 @@ export const getContactById = async (id, userId, role) => {
   return contact;
 };
 export const createContact = async (payload, userId) =>
-  await Contact.create({ ...payload, parentId: userId });
+  await Contact.create({ ...payload, userId });
 
 export const upsertContact = async (id, payload, options = {}) => {
   const rawResults = await Contact.findByIdAndUpdate(id, payload, {
@@ -102,10 +102,16 @@ export const upsertContact = async (id, payload, options = {}) => {
   };
 };
 
-export const deleteContactById = async (contactId) => {
-  const result = await Contact.findByIdAndDelete(contactId);
+export const deleteContactById = async (contactId, userId, role) => {
+  let contact;
 
-  if (!result) {
+  if (role !== 'admin') {
+    contact = await Contact.findOneAndDelete({ _id: contactId, userId });
+  } else {
+    contact = await Contact.findByIdAndDelete(contactId);
+  }
+
+  if (!contact) {
     throw createHttpError(404, 'Contact you want to delete - not found');
   }
 };
