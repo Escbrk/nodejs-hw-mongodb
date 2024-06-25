@@ -87,7 +87,7 @@ export const createContact = async (payload, userId) =>
   await Contact.create({ ...payload, userId });
 
 export const upsertContact = async (contactId, payload, options = {}) => {
-  const rawResults = await Contact.findByIdAndUpdate(contactId, payload, {
+  const rawResults = await Contact.findOneAndUpdate({ _id: contactId }, payload, {
     new: true,
     includeResultMetadata: true,
     ...options,
