@@ -3,7 +3,9 @@ import crypto from 'crypto';
 import { User } from '../db/models/user.js';
 import createHttpError from 'http-errors';
 import { Session } from '../db/models/session.js';
-import { TOKEN_PERIOD } from '../constants/constants.js';
+import { ENV_VARS, TOKEN_PERIOD } from '../constants/constants.js';
+import jwt from 'jsonwebtoken';
+import { env } from '../utils/env.js';
 
 const createSession = () => {
   return {
@@ -74,5 +76,18 @@ export const logoutUser = async ({ sessionId, sessionToken }) => {
 };
 
 export const sendResetEmail = async ({ email }) => {
-  await User.findOne({ email });
+  const user = await User.findOne({ email });
+
+  if (!user) throw createHttpError(404, 'User not found!');
+
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      email,
+    },
+    env(ENV_VARS.JWT_SECRET),
+    {
+      expiresIn: '5m',
+    },
+  );
 };
