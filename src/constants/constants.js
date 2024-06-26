@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 export const ENV_VARS = {
   PORT: 'PORT',
   MONGODB_USER: 'MONGODB_USER',
@@ -34,4 +36,8 @@ export const ROLES = {
 export const TOKEN_PERIOD = {
   MINS_30: Date.now() + 1000 * 60 * 30, // 30 mins
   DAYS_30: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days
+};
+
+export const DIRECTORIES = {
+  TEMPLATES_DIR: path.join(process.cwd(), 'src', 'templates'),
 };
