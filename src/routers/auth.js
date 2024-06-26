@@ -22,6 +22,9 @@ authRouter.post(
   validateBody(loginUserSchema),
   ctrlWrapper(loginUserController),
 );
+
+authRouter.post('/auth/send-reset-email', ctrlWrapper());
+
 authRouter.post('/refresh', ctrlWrapper(refreshTokenController));
 authRouter.post('/logout', ctrlWrapper(logoutController));
 

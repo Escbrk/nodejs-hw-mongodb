@@ -9,7 +9,7 @@ const createSession = () => {
   return {
     accessToken: crypto.randomBytes(40).toString('base64'),
     refreshToken: crypto.randomBytes(40).toString('base64'),
-    accessTokenValidUntil: TOKEN_PERIOD.MINS_15,
+    accessTokenValidUntil: TOKEN_PERIOD.MINS_30,
     refreshTokenValidUntil: TOKEN_PERIOD.DAYS_30,
   };
 };
@@ -71,4 +71,8 @@ export const logoutUser = async ({ sessionId, sessionToken }) => {
     _id: sessionId,
     refreshToken: sessionToken,
   });
+};
+
+export const sendResetEmail = async ({ email }) => {
+  await User.findOne({ email });
 };
