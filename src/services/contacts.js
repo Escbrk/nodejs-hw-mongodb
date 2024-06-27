@@ -90,10 +90,16 @@ export const createContact = async ({ photo, ...payload }, userId) => {
   return await Contact.create({ ...payload, userId, photo: url });
 };
 
-export const upsertContact = async (contactId, payload, options = {}) => {
+export const upsertContact = async (
+  contactId,
+  { photo, ...payload },
+  options = {},
+) => {
+  const url = await saveToCloud(photo);
+
   const rawResults = await Contact.findOneAndUpdate(
-    { _id: contactId },
-    payload,
+    contactId,
+    { ...payload, photo: url },
     {
       new: true,
       includeResultMetadata: true,
