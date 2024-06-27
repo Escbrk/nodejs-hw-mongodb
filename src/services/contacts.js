@@ -98,7 +98,7 @@ export const upsertContact = async (
   const url = await saveToCloud(photo);
 
   const rawResults = await Contact.findOneAndUpdate(
-    contactId,
+    { _id: contactId },
     { ...payload, photo: url },
     {
       new: true,
