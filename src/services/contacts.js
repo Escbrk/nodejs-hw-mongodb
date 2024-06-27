@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 import { ROLES } from '../constants/constants.js';
+import { saveToCloud } from '../utils/saveToCloud.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -83,15 +84,22 @@ export const getContactById = async (contactId, userId, role) => {
 
   return contact;
 };
-export const createContact = async (payload, userId) =>
-  await Contact.create({ ...payload, userId });
+export const createContact = async ({ photo, ...payload }, userId) => {
+  const url = await saveToCloud(photo);
+
+  return await Contact.create({ ...payload, userId, photo: url });
+};
 
 export const upsertContact = async (contactId, payload, options = {}) => {
-  const rawResults = await Contact.findOneAndUpdate({ _id: contactId }, payload, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
+  const rawResults = await Contact.findOneAndUpdate(
+    { _id: contactId },
+    payload,
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
 
   if (!rawResults || !rawResults.value) {
     throw createHttpError(404, 'Contact not found');

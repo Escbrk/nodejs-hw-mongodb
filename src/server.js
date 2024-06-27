@@ -12,7 +12,15 @@ import cookieParser from 'cookie-parser';
 export const setupServer = () => {
   const app = express();
 
-  app.use(express.json());
+  app.use(
+    express.json({
+      type: [
+        'application/json',
+        'application/vnd.api+json',
+        'multipart/formdata',
+      ],
+    }),
+  );
   app.use(cors());
   app.use(cookieParser());
   // app.use(

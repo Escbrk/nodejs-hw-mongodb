@@ -24,7 +24,6 @@ export const ENV_VARS = {
     CLOUD_NAME: 'CLOUD_NAME',
     API_KEY: 'API_KEY',
     API_SECRET: 'API_SECRET',
-    IS_CLOUDINARY_ENABLED: 'IS_CLOUDINARY_ENABLED',
   },
 };
 
@@ -40,4 +39,5 @@ export const TOKEN_PERIOD = {
 
 export const DIRECTORIES = {
   TEMPLATES_DIR: path.join(process.cwd(), 'src', 'templates'),
+  TEMP_UPLOAD_DIR: path.join(process.cwd(), 'temp'),
 };

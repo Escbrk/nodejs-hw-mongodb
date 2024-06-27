@@ -14,6 +14,7 @@ import { createContactsSchema } from '../validation/createContactsSchema.js';
 import { valideteMongoId } from '../middlewares/validateMongoId.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { checkRoles } from '../middlewares/checkRoles.js';
+import { upload } from '../utils/upload.js';
 
 const contactsRouter = Router();
 
@@ -30,6 +31,7 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/',
+  upload.single('photo'),
   validateBody(createContactsSchema),
   ctrlWrapper(createContactController),
 );
@@ -37,6 +39,7 @@ contactsRouter.post(
 contactsRouter.patch(
   '/:contactId',
   checkRoles('admin', 'user'),
+  upload.single('photo'),
   validateBody(updateContactsSchema),
   ctrlWrapper(patchContactController),
 );
@@ -44,6 +47,7 @@ contactsRouter.patch(
 contactsRouter.put(
   '/:contactId',
   checkRoles('admin', 'user'),
+  upload.single('photo'),
   validateBody(createContactsSchema),
   ctrlWrapper(putContactController),
 );
