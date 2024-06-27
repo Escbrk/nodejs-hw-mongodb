@@ -70,9 +70,9 @@ export const sendResetEmailController = async (req, res) => {
 export const resetPwdController = async (req, res) => {
   await resetPwd(req.body);
 
-  return {
+  res.json({
     status: 200,
     message: 'Password has been successfully reset.',
     data: {},
-  };
+  });
 };
