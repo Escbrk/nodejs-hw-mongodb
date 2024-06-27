@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqSuffix = Date.now();
-    cb(null, uniqSuffix + '_' + file.originalname);
+    cb(null, `${uniqSuffix}_${file.originalname}`);
   },
 });
 
