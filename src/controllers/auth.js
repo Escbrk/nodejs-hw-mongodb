@@ -3,6 +3,7 @@ import {
   loginUser,
   logoutUser,
   refreshSession,
+  resetPwd,
   sendResetEmail,
 } from '../services/auth.js';
 import { setupSessionCookies } from '../utils/setupSessionCookies.js';
@@ -64,4 +65,14 @@ export const sendResetEmailController = async (req, res) => {
     message: 'Reset password email has been successfully sent.',
     data: {},
   });
+};
+
+export const resetPwdController = async (req, res) => {
+  await resetPwd(req.body);
+
+  return {
+    status: 200,
+    message: 'Password has been successfully reset.',
+    data: {},
+  };
 };

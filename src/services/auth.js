@@ -9,6 +9,7 @@ import { env } from '../utils/env.js';
 import fs from 'node:fs/promises';
 import Handlebars from 'handlebars';
 import { sendEmail } from '../utils/sendEmail.js';
+import path from 'node:path';
 
 const createSession = () => {
   return {
@@ -78,7 +79,7 @@ export const logoutUser = async ({ sessionId, sessionToken }) => {
   });
 };
 
-export const sendResetEmail = async ({ email }) => {
+export const sendResetEmail = async (email) => {
   const user = await User.findOne({ email });
 
   if (!user) throw createHttpError(404, 'User not found!');
@@ -95,8 +96,7 @@ export const sendResetEmail = async ({ email }) => {
   );
 
   const templateSource = await fs.readFile(
-    DIRECTORIES.TEMPLATES_DIR,
-    'send-reset-password.html',
+    path.join(DIRECTORIES.TEMPLATES_DIR, 'send-reset-password.html'),
   );
 
   const template = Handlebars.compile(templateSource.toString());
@@ -122,4 +122,24 @@ export const sendResetEmail = async ({ email }) => {
       'Failed to send the email, please try again later.',
     );
   }
+};
+
+export const resetPwd = async ({ token, password }) => {
+  let tokenPayload;
+
+  try {
+    tokenPayload = jwt.verify(token, env(ENV_VARS.JWT_SECRET));
+  } catch (err) {
+    throw createHttpError(401, 'Token is expired or invalid.');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await User.findOneAndUpdate(
+    {
+      _id: tokenPayload.sub,
+      email: tokenPayload.email,
+    },
+    { password: hashedPassword },
+  );
 };
