@@ -3,9 +3,12 @@ import crypto from 'crypto';
 import { User } from '../db/models/user.js';
 import createHttpError from 'http-errors';
 import { Session } from '../db/models/session.js';
-import { ENV_VARS, TOKEN_PERIOD } from '../constants/constants.js';
+import { DIRECTORIES, ENV_VARS, TOKEN_PERIOD } from '../constants/constants.js';
 import jwt from 'jsonwebtoken';
 import { env } from '../utils/env.js';
+import fs from 'node:fs/promises';
+import Handlebars from 'handlebars';
+import { sendEmail } from '../utils/sendEmail.js';
 
 const createSession = () => {
   return {
@@ -90,4 +93,33 @@ export const sendResetEmail = async ({ email }) => {
       expiresIn: '5m',
     },
   );
+
+  const templateSource = await fs.readFile(
+    DIRECTORIES.TEMPLATES_DIR,
+    'send-reset-password.html',
+  );
+
+  const template = Handlebars.compile(templateSource.toString());
+
+  const html = template({
+    name: user.name,
+    link: `${env(
+      ENV_VARS.DOMAIN.APP_DOMAIN,
+    )}reset-password?token=${resetToken}`,
+  });
+
+  try {
+    await sendEmail({
+      from: env(ENV_VARS.SMTP_FROM),
+      to: email,
+      subject: 'Reset your password',
+      html,
+    });
+  } catch (err) {
+    console.log(err);
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
+  }
 };
