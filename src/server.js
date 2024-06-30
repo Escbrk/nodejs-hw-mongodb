@@ -5,7 +5,7 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { env } from './utils/env.js';
 import { ENV_VARS } from './constants/constants.js';
-
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 import rootRouter from './routers/index.js';
 import cookieParser from 'cookie-parser';
 
@@ -30,6 +30,8 @@ export const setupServer = () => {
   //     },
   //   }),
   // );
+
+  app.use('/api-docs', swaggerDocs());
 
   app.use(rootRouter);
 
