@@ -8,7 +8,10 @@ info:
   description: >
     <опис вашого додатку>
 tags:
-  # теги, що ви будете використовувати
+  - name: Contacts
+    description: Operation about contacts
+  - name: Auth
+    description: Auth operations
 servers:
   - url: http://localhost:3002
   - url: https://nodejs-hw-mongodb-y0vb.onrender.com
