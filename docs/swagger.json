@@ -12,9 +12,21 @@
   "servers": [
     {
       "url": "http://localhost:3002"
+    },
+    {
+      "url": "https://nodejs-hw-mongodb-y0vb.onrender.com"
     }
   ],
-  "tags": null,
+  "tags": [
+    {
+      "name": "Contacts",
+      "description": "Operation about contacts"
+    },
+    {
+      "name": "Auth",
+      "description": "Auth operations"
+    }
+  ],
   "paths": {
     "/contacts": {
       "get": {
@@ -35,7 +47,8 @@
             "name": "page",
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 1,
+              "default": 1
             }
           },
           {
@@ -43,7 +56,8 @@
             "name": "perPage",
             "schema": {
               "type": "integer",
-              "example": 10
+              "example": 10,
+              "default": 10
             }
           },
           {
@@ -63,7 +77,8 @@
                 "asc",
                 "desc"
               ],
-              "example": "asc"
+              "example": "asc",
+              "default": "asc"
             }
           }
         ],
@@ -86,16 +101,62 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully found contacts"
+                      "example": "Successfully found contacts!"
                     },
                     "data": {
                       "type": "object",
-                      "$ref": "#/components/schemas/contact"
+                      "required": [
+                        "contacts",
+                        "page",
+                        "perPage",
+                        "totalItems",
+                        "totalPages",
+                        "hasPreviousPage",
+                        "hasNextPage"
+                      ],
+                      "properties": {
+                        "contacts": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/contact"
+                          }
+                        },
+                        "page": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "perPage": {
+                          "type": "number",
+                          "example": 10
+                        },
+                        "totalItems": {
+                          "type": "number",
+                          "example": 20
+                        },
+                        "totalPages": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "hasNextPage": {
+                          "type": "boolean",
+                          "example": false
+                        },
+                        "hasPreviousPage": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
                     }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       },
@@ -111,19 +172,71 @@
             "bearerAuth": []
           }
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "example": "+380000000005"
+                  },
+                  "email": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "test@test.com"
+                      },
+                      {
+                        "type": "null",
+                        "example": null
+                      }
+                    ]
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "default": false,
+                    "example": false
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ],
+                    "example": "personal",
+                    "default": "personal"
+                  },
+                  "photo": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
+                      },
+                      {
+                        "type": "null",
+                        "example": null
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "phoneNumber"
+                ]
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": "Create contact",
             "content": {
               "application/json": {
@@ -137,73 +250,26 @@
                   "properties": {
                     "status": {
                       "type": "integer",
-                      "example": 200
+                      "example": 201
                     },
                     "message": {
                       "type": "string",
                       "example": "Successfully created contact"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "$ref": "#/components/schemas/contact"
                     }
                   }
                 }
               }
             }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Upsert contact",
-        "operationId": "upsertContact",
-        "description": "Upsert contact",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Upsert contact",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully upserted contact with id 65ca67e7ae7f10c88b598384!"
-                    },
-                    "data": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       }
@@ -228,7 +294,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+              "example": "65e4decdd286b30065d54af9"
             }
           }
         ],
@@ -251,7 +317,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully found contact with id 65ca67e7ae7f10c88b598384!"
+                      "example": "Successfully found contact with id 65e4decdd286b30065d54af9!"
                     },
                     "data": {
                       "type": "object",
@@ -261,6 +327,18 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       },
@@ -283,10 +361,69 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+              "example": "65e4decdd286b30065d54af9"
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "example": "+380000000005"
+                  },
+                  "email": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "test@test.com"
+                      },
+                      {
+                        "type": "null",
+                        "example": null
+                      }
+                    ]
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "default": false,
+                    "example": false
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ],
+                    "example": "personal",
+                    "default": "personal"
+                  },
+                  "photo": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
+                      },
+                      {
+                        "type": "null",
+                        "example": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Patche contact by id",
@@ -306,15 +443,28 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully patched contact with id 65ca67e7ae7f10c88b598384!"
+                      "example": "Successfully patched contact with id 65e4decdd286b30065d54af9!"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "$ref": "#/components/schemas/contact"
                     }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       },
@@ -337,10 +487,73 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+              "example": "65e4decdd286b30065d54af9"
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "example": "+380000000005"
+                  },
+                  "email": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "test@test.com"
+                      },
+                      {
+                        "type": "null",
+                        "example": null
+                      }
+                    ]
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "default": false,
+                    "example": false
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ],
+                    "example": "personal",
+                    "default": "personal"
+                  },
+                  "photo": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
+                      },
+                      {
+                        "type": "null",
+                        "example": null
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "phoneNumber"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Upsert contact",
@@ -360,15 +573,25 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully upserted contact with id 65ca67e7ae7f10c88b598384!"
+                      "example": "Successfully upserted contact with id 65e4decdd286b30065d54af9!"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "$ref": "#/components/schemas/contact"
                     }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       },
@@ -391,13 +614,79 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+              "example": "65e4decdd286b30065d54af9"
             }
           }
         ],
         "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register user",
+        "operationId": "registerUser",
+        "description": "Register user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "qweqwe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "admin",
+                      "user"
+                    ],
+                    "default": "user",
+                    "example": "admin"
+                  }
+                },
+                "required": [
+                  "name",
+                  "password",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
           "200": {
-            "description": "Delete contact by id",
+            "description": "Register user",
             "content": {
               "application/json": {
                 "schema": {
@@ -414,15 +703,399 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully deleted contact with id 65ca67e7ae7f10c88b598384!"
+                      "example": "Successfully registered user"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "$ref": "#/components/schemas/user"
                     }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login user",
+        "operationId": "loginUser",
+        "description": "Login user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "qweqwe"
+                  }
+                },
+                "required": [
+                  "password",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully logged in an user!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "accessToken"
+                      ],
+                      "properties": {
+                        "accessToken": {
+                          "type": "string",
+                          "example": "QxIy04Y5o0knQjiWPQwneUXbXoj3Gb5u5P7XdyW+H4dJ7s079OK9vA=="
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          }
+        }
+      }
+    },
+    "/auth/requestResetPassword": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Request reset password",
+        "operationId": "reserPassword",
+        "description": "Request reset password",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request reset password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Reset password email has been successfully sent"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User not found!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/resetPwd": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Reset password",
+        "operationId": "resetPwd",
+        "description": "Reset password",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "example": "qweqwe"
+                  },
+                  "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjdjY2RlMjlhZTVjNGQ5ZDQ3MzBhMDkiLCJlbWFpbCI6InBhaGFuY2hlZzc3N0BnbWFpbC5jb20iLCJpYXQiOjE3MTk4MjExMzksImV4cCI6MTcxOTgyMTQzOX0.uhVoAqumk_zKTlYaWA_u70nWvDPIOvSJIxWxzEPjZk0"
+                  }
+                },
+                "required": [
+                  "password",
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Password has been successfully reset."
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token is expired or invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "error"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Token is expired or invalid."
+                    },
+                    "error": {
+                      "type": "array",
+                      "example": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Refresh token",
+        "operationId": "refreshToken",
+        "description": "Refresh token",
+        "security": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully refreshed a session!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "accessToken"
+                      ],
+                      "properties": {
+                        "accessToken": {
+                          "type": "string",
+                          "example": "qMLXJ+JsoccSUKzd+87+sTXHnerNB9uaWUuZl+5XZs+4oepfrC5/dQ=="
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "error"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Session not found"
+                    },
+                    "error": {
+                      "type": "array",
+                      "example": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout",
+        "description": "Logout",
+        "security": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -503,7 +1176,190 @@
           "userId": {
             "description": "Parent's id",
             "type": "string",
-            "example": "65e4decdd286b30065d54af9"
+            "example": "65e4decdd286b30065djKuf87"
+          }
+        }
+      },
+      "user": {
+        "type": "object",
+        "required": [
+          "name",
+          "password",
+          "email"
+        ],
+        "properties": {
+          "name": {
+            "description": "User's name",
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "description": "User's email",
+            "example": "test@test.com"
+          },
+          "role": {
+            "description": "User's role",
+            "enum": [
+              "admin",
+              "user"
+            ],
+            "default": "user",
+            "example": "user"
+          },
+          "_id": {
+            "description": "User's ID",
+            "example": "66825cabab3a0450cfd99690"
+          }
+        }
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Invalid ID!",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "error"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 400
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Invalid ID!"
+                },
+                "error": {
+                  "type": "array",
+                  "example": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "error"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Token is expired!"
+                },
+                "error": {
+                  "type": "array",
+                  "example": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Contact Not Found!",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 404
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Contact Not Found!"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Email in use!",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "error"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 409
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Email in use!"
+                },
+                "error": {
+                  "type": "array",
+                  "example": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Mongoose Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "data"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 404
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Mongoose Error"
+                },
+                "data": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "description": "Error description",
+                      "type": "string",
+                      "example": "Mongoose Error"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

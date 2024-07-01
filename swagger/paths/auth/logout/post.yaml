@@ -1,0 +1,17 @@
+tags:
+  - Auth
+summary: Logout
+operationId: logout
+description: 'Logout'
+security: []
+requestBody:
+  required: false
+  content:
+    application/json:
+      schema:
+        type: object
+responses:
+  '204':
+    description: No Content
+  # '500':
+  #   $ref: '../../components/responses/500.yaml'

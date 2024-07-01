@@ -1,4 +1,4 @@
-description: Contact Not Found!
+description: Email in use!
 content:
   application/json:
     schema:
@@ -6,10 +6,14 @@ content:
       required:
         - status
         - message
+        - error
       properties:
         status:
           type: integer
-          example: 404
+          example: 409
         message:
           type: string
-          example: Contact Not Found!
+          example: Email in use!
+        error:
+          type: array
+          example: []

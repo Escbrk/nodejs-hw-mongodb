@@ -23,12 +23,13 @@ export const getContactsController = async (req, res) => {
       userId: req.user._id,
       role: req.user.role,
     });
-    if (!contacts) {
-      return res.status(404).json({
-        status: 404,
-        message: 'Not Found!',
-      });
-    }
+
+    // if (!contacts) {
+    //   return res.status(404).json({
+    //     status: 404,
+    //     message: 'Not Found!',
+    //   });
+    // }
 
     return res.json({
       status: 200,

@@ -11,7 +11,44 @@ parameters:
     required: true
     schema:
       type: string
-      example: '65ca67e7ae7f10c88b598384'
+      example: '65e4decdd286b30065d54af9'
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+            example: 'John Doe'
+          phoneNumber:
+            type: string
+            example: '+380000000005'
+          email:
+            oneOf:
+              - type: string
+                example: test@test.com
+              - type: 'null'
+                example: null
+          isFavourite:
+            type: boolean
+            default: false
+            example: false
+          contactType:
+            type: string
+            enum: ['work', 'home', 'personal']
+            example: 'personal'
+            default: personal
+          photo:
+            oneOf:
+              - type: string
+                example: https://res.cloudinary.com/uqwgdu/image/upload/image.png
+              - type: 'null'
+                example: null
+        required:
+              - name
+              - phoneNumber
 responses:
   '200':
     description: 'Upsert contact'
@@ -29,9 +66,13 @@ responses:
               example: 200
             message:
               type: string
-              example: Successfully upserted contact with id 65ca67e7ae7f10c88b598384!
+              example: Successfully upserted contact with id 65e4decdd286b30065d54af9!
             data:
               type: object
-              # $ref: '../../../components/schemas/contact.yaml'
-  # '404':
-    # $ref: '../../../components/responses/404.yaml'
+              $ref: '../../../components/schemas/contact.yaml'
+  '400':
+    $ref: '../../../components/responses/400.yaml'
+  '404':
+    $ref: '../../../components/responses/404.yaml'
+  '500':
+    $ref: '../../../components/responses/500.yaml'
