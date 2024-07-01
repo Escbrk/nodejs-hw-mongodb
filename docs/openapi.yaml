@@ -6,7 +6,7 @@ info:
     name: Apache 2.0
     url: <http://www.apache.org/licenses/LICENSE-2.0.html>
   description: >
-    <опис вашого додатку>
+    This is a documentation of Contacts App
 tags:
   - name: Contacts
     description: Operation about contacts
