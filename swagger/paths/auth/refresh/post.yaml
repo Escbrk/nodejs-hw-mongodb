@@ -5,11 +5,7 @@ operationId: refreshToken
 description: 'Refresh token'
 security: []
 requestBody:
-  required: false
-  content:
-    application/json:
-      schema:
-        type: object
+  content: {}
 responses:
   '200':
     description: 'Refresh token'
@@ -56,5 +52,3 @@ responses:
             error:
               type: array
               example: []
-  # '500':
-  #   $ref: '../../components/responses/500.yaml'
