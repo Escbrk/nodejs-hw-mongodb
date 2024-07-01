@@ -4,8 +4,7 @@ summary: Refresh token
 operationId: refreshToken
 description: 'Refresh token'
 security: []
-requestBody:
-  content: {}
+requestBody: {}
 responses:
   '200':
     description: 'Refresh token'

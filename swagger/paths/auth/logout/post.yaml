@@ -4,8 +4,7 @@ summary: Logout
 operationId: logout
 description: 'Logout'
 security: []
-requestBody:
-  content: {}
+requestBody: {}
 responses:
   '204':
     description: No Content
